@@ -4,9 +4,11 @@ import com.game.kriegsspiel.play.unit.UnitType;
 import com.game.kriegsspiel.play.unit.Units;
 
 public class Infantry extends Units {
-    private UnitType unitType;
 
-    public Infantry() {
+    public Infantry(String playerName) {
+        this.playerName = playerName;
         unitType = UnitType.INFANTRY;
+        armor = 10;
+        strong = 10;
     }
 }
