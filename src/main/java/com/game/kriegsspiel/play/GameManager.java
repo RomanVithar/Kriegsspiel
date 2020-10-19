@@ -1,5 +1,6 @@
 package com.game.kriegsspiel.play;
 
+import com.game.kriegsspiel.play.services.GameConstant;
 import com.game.kriegsspiel.play.services.GameInformation;
 import com.game.kriegsspiel.play.services.GameMath;
 import com.game.kriegsspiel.play.unit.Units;
@@ -17,12 +18,6 @@ public class GameManager {
     private Deque<String> playerNames;
     private GameMap map;
 
-    private final int NUMBER_INFANTRY = 7;
-    private final int NUMBER_TANK = 4;
-    private final int QUANTITY_INFANTRY = 100;
-    private final int QUANTITY_TANK = 20;
-
-
     public GameManager() {
         playerList = new HashMap<>(2);
         playerNames = new ArrayDeque<>(2);
@@ -33,10 +28,16 @@ public class GameManager {
         playerList.put(name, new Player(name));
     }
 
-    public void startGame() {
+    public GameInformation startGame() {
+        GameInformation gi = new GameInformation();
+        if(playerList.keySet().size()<2){
+            gi.setMessageResponse("В игре должно учавствовать как минимум 2 игрока");
+            return gi;
+        }
         playerNames.addAll(playerList.keySet());
         arrangeRegions();
         arrangeUnits();
+        return gi;
     }
 
     /**
@@ -54,11 +55,6 @@ public class GameManager {
      */
     public GameInformation move(String playerName, int x1, int y1, int x2, int y2) {
         GameInformation gameInfo = new GameInformation();
-        if (Math.abs(x2 - x1) > map.getUnit(y1, x1).getLengthMove()
-                || Math.abs(y2 - y1) > map.getUnit(y1, x1).getLengthMove()) {
-            gameInfo.setMessageResponse("Данный отряд не может переместиться в эту точку");
-            return gameInfo;
-        }
         if (!isThatPlayerTurn(playerName)) {
             gameInfo.setMessageResponse("Сейчас ход другого игрока");
             return gameInfo;
@@ -67,8 +63,13 @@ public class GameManager {
             gameInfo.setMessageResponse("В этой точке нет ваших отрядов");
             return gameInfo;
         }
-        if (map.getUnit(y1, x1).getPlayerName().equals(playerName)) {
+        if (!map.getUnit(y1, x1).getPlayerName().equals(playerName)) {
             gameInfo.setMessageResponse("На чужой кусок не разевай роток");
+            return gameInfo;
+        }
+        if (Math.abs(x2 - x1) > map.getUnit(y1, x1).getLengthMove()
+                || Math.abs(y2 - y1) > map.getUnit(y1, x1).getLengthMove()) {
+            gameInfo.setMessageResponse("Данный отряд не может переместиться в эту точку");
             return gameInfo;
         }
         if (map.getUnit(y2, x2) != null) {
@@ -157,18 +158,15 @@ public class GameManager {
     }
 
     private void arrangeUnits() {
-         /*
-        TODO расставить войска
-         */
         for (String name : playerNames) {
-            for (int i = 0; i < NUMBER_INFANTRY; i++) {
+            for (int i = 0; i < GameConstant.NUMBER_INFANTRY; i++) {
                 Units units = new Infantry(name);
-                fillMapUnitsBy(QUANTITY_INFANTRY, units);
+                fillMapUnitsBy(GameConstant.QUANTITY_INFANTRY, units);
                 playerList.get(name).units.add(units);
             }
-            for (int i = 0; i < NUMBER_TANK; i++) {
+            for (int i = 0; i < GameConstant.NUMBER_TANK; i++) {
                 Units units = new Tank(name);
-                fillMapUnitsBy(QUANTITY_TANK, units);
+                fillMapUnitsBy(GameConstant.QUANTITY_TANK, units);
                 playerList.get(name).units.add(units);
             }
         }
