@@ -1,21 +1,22 @@
 package com.game.kriegsspiel.play.services;
 
+import com.game.kriegsspiel.play.Player;
 import com.game.kriegsspiel.play.unit.Units;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GameMath {
-    private static final double chanceOnDeliveryInf = 0.9;
+    private static final double chanceOnDeliveryInf = 0.8;
 
-    public static void determineInfReceived(GameInformation gameInf) {
+    public static void determineInfReceived(Player player, GameInformation gameInf) {
         List<Units> newUnits = new ArrayList<>();
-        for (int i = 0; i < gameInf.player.units.size(); i++) {
+        for (int i = 0; i < player.units.size(); i++) {
             if (Math.random() < chanceOnDeliveryInf) {
-                newUnits.add(gameInf.player.units.get(i));
+                newUnits.add(player.units.get(i));
             }
         }
-        gameInf.player.units = newUnits;
+        gameInf.myUnits = newUnits;
     }
 
     public static Units calculateWhoAlive(Units unit1, Units unit2){

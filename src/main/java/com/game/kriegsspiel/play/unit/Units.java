@@ -9,6 +9,11 @@ public abstract class Units {
     protected int quantity;
     protected double strong;
     protected double armor;
+    protected double lengthMove;
+
+    public double getLengthMove() {
+        return lengthMove;
+    }
 
     public String getPlayerName() {
         return playerName;

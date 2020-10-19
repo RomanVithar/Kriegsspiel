@@ -7,10 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameInformation {
-    public Player player;//отсюда возмём координаты своих войск
-    public  List<Units> units;//отсюда возмём вражеские(или свои которые распологаются рядом) юниты если они есть
+    public List<Units> myUnits;
+    public List<Units> enemyUnits;
+    public String messageResponse;
 
     public GameInformation() {
-        units = new ArrayList<>();
+        enemyUnits = new ArrayList<>();
+        myUnits = new ArrayList<>();
+    }
+
+    public void setMessageResponse(String messageResponse) {
+        this.messageResponse = messageResponse;
     }
 }

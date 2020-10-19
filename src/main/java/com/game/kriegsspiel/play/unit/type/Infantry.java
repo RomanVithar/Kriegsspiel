@@ -10,5 +10,6 @@ public class Infantry extends Units {
         unitType = UnitType.INFANTRY;
         armor = 10;
         strong = 10;
+        lengthMove = 1;
     }
 }

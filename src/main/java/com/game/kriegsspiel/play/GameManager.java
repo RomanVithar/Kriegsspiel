@@ -49,109 +49,111 @@ public class GameManager {
      * @param y1         - the y coordinate from which to move units.
      * @param x2         - the x coordinate to move to.
      * @param y2         - the y coordinate to move to.
+     *
+     * @return - return information about vision available that player
      */
-    public void move(String playerName, int x1, int y1, int x2, int y2) {
-        if (isThatPlayerTurn(playerName)) {
-            if (map.getUnit(y1, x1) != null) {
-                if (map.getUnit(y1, x1).getPlayerName().equals(playerName)) {
-                    if (map.getUnit(y2, x2) != null) {
-                        if (!map.getUnit(y2, x2).getPlayerName().equals(playerName)) {
-                            for(int i=0;i<playerList.get(map.getUnit(y2,x2).getPlayerName()).units.size();i++){
-                                if(playerList.get(map.getUnit(y2,x2).getPlayerName()).units.get(i).getPosition().x == x2 &&
-                                        playerList.get(map.getUnit(y2,x2).getPlayerName()).units.get(i).getPosition().y==y2){
-                                    playerList.get(map.getUnit(y2,x2).getPlayerName()).units.remove(i);
-                                }
-                            }
-                            for(int i=0;i<playerList.get(playerName).units.size();i++){
-                                if(playerList.get(playerName).units.get(i).getPosition().x == x1 &&
-                                        playerList.get(playerName).units.get(i).getPosition().y==y1){
-                                    playerList.get(playerName).units.remove(i);
-                                }
-                            }
-                            map.setUnit(y2,x2,GameMath.calculateWhoAlive(map.getUnit(y1,x1),map.getUnit(y2,x2)));
-                            map.setUnit(y1,x1,null);
-                            playerList.get(map.getUnit(y2,x2).getPlayerName()).units.add(map.getUnit(y2,x2));
-                            nextTurn();
-                        } else {
-                            System.out.println("Пока не доступное перемещение");
-                        }
-                    } else {
-                        if (y2 < map.getMapSize() && y2 >= 0 && x2 < map.getMapSize() && x2 >= 0) {
-                            map.setUnit(y2, x2, map.getUnit(y2, x2));
-                            map.setUnit(y1,x1, null);
-                            nextTurn();
-                        }else{
-                            System.out.println("Выход за предеы карты");
-                        }
+    public GameInformation move(String playerName, int x1, int y1, int x2, int y2) {
+        GameInformation gameInfo = new GameInformation();
+        if (Math.abs(x2 - x1) > map.getUnit(y1, x1).getLengthMove()
+                || Math.abs(y2 - y1) > map.getUnit(y1, x1).getLengthMove()) {
+            gameInfo.setMessageResponse("Данный отряд не может переместиться в эту точку");
+            return gameInfo;
+        }
+        if (!isThatPlayerTurn(playerName)) {
+            gameInfo.setMessageResponse("Сейчас ход другого игрока");
+            return gameInfo;
+        }
+        if (map.getUnit(y1, x1) == null) {
+            gameInfo.setMessageResponse("В этой точке нет ваших отрядов");
+            return gameInfo;
+        }
+        if (map.getUnit(y1, x1).getPlayerName().equals(playerName)) {
+            gameInfo.setMessageResponse("На чужой кусок не разевай роток");
+            return gameInfo;
+        }
+        if (map.getUnit(y2, x2) != null) {
+            if (!map.getUnit(y2, x2).getPlayerName().equals(playerName)) {
+                for (int i = 0; i < playerList.get(map.getUnit(y2, x2).getPlayerName()).units.size(); i++) {
+                    if (playerList.get(map.getUnit(y2, x2).getPlayerName()).units.get(i).getPosition().x == x2 &&
+                            playerList.get(map.getUnit(y2, x2).getPlayerName()).units.get(i).getPosition().y == y2) {
+                        playerList.get(map.getUnit(y2, x2).getPlayerName()).units.remove(i);
                     }
-                } else {
-                    System.out.println("На чужой кусок не разевай роток");
                 }
+                for (int i = 0; i < playerList.get(playerName).units.size(); i++) {
+                    if (playerList.get(playerName).units.get(i).getPosition().x == x1 &&
+                            playerList.get(playerName).units.get(i).getPosition().y == y1) {
+                        playerList.get(playerName).units.remove(i);
+                    }
+                }
+                map.setUnit(y2, x2, GameMath.calculateWhoAlive(map.getUnit(y1, x1), map.getUnit(y2, x2)));
+                map.setUnit(y1, x1, null);
+                playerList.get(map.getUnit(y2, x2).getPlayerName()).units.add(map.getUnit(y2, x2));
+                nextTurn();
             } else {
-                System.out.println("В этой точке нет ваших отрядов");
+                gameInfo.setMessageResponse("Пока не доступное перемещение");
+                return gameInfo;
             }
         } else {
-            System.out.println("Сейчас ход другого игрока");
+            if (y2 < map.getMapSize() && y2 >= 0 && x2 < map.getMapSize() && x2 >= 0) {
+                map.setUnit(y2, x2, map.getUnit(y2, x2));
+                map.setUnit(y1, x1, null);
+                nextTurn();
+            } else {
+                gameInfo.setMessageResponse("Выход за предеы карты");
+                return gameInfo;
+            }
         }
+        return getVision(playerName);
     }
 
     public GameInformation getVision(String playerName) {
-        if (isThatPlayerTurn(playerName)) {
-            GameInformation gameInfo = new GameInformation();
-            gameInfo.player = playerList.get(playerName);
-            GameMath.determineInfReceived(gameInfo);
-            for (Units myUnit : gameInfo.player.units) {
-                int i = myUnit.getPosition().y;
-                int j = myUnit.getPosition().x;
-                if (map.getUnit(i - 1, j) != null) {
-                    if (!map.getUnit(i - 1, j).getPlayerName().equals(playerName)) {
-                        gameInfo.units.add(map.getUnit(i - 1, j));
-                    }
-                }
-                if (map.getUnit(i + 1, j) != null) {
-                    if (!map.getUnit(i + 1, j).getPlayerName().equals(playerName)) {
-                        gameInfo.units.add(map.getUnit(i + 1, j));
-                    }
-                }
-                if (map.getUnit(i, j - 1) != null) {
-                    if (!map.getUnit(i, j - 1).getPlayerName().equals(playerName)) {
-                        gameInfo.units.add(map.getUnit(i, j - 1));
-                    }
-                }
-                if (map.getUnit(i, j + 1) != null) {
-                    if (!map.getUnit(i, j + 1).getPlayerName().equals(playerName)) {
-                        gameInfo.units.add(map.getUnit(i, j + 1));
-                    }
-                }
-                if (map.getUnit(i + 1, j + 1) != null) {
-                    if (!map.getUnit(i + 1, j + 1).getPlayerName().equals(playerName)) {
-                        gameInfo.units.add(map.getUnit(i + 1, j + 1));
-                    }
-                }
-                if (map.getUnit(i + 1, j - 1) != null) {
-                    if (!map.getUnit(i + 1, j - 1).getPlayerName().equals(playerName)) {
-                        gameInfo.units.add(map.getUnit(i + 1, j - 1));
-                    }
-                }
-                if (map.getUnit(i - 1, j + 1) != null) {
-                    if (!map.getUnit(i - 1, j + 1).getPlayerName().equals(playerName)) {
-                        gameInfo.units.add(map.getUnit(i - 1, j + 1));
-                    }
-                }
-                if (map.getUnit(i - 1, j - 1) != null) {
-                    if (!map.getUnit(i - 1, j - 1).getPlayerName().equals(playerName)) {
-                        gameInfo.units.add(map.getUnit(i - 1, j - 1));
-                    }
+        GameInformation gameInfo = new GameInformation();
+        GameMath.determineInfReceived(playerList.get(playerName), gameInfo);
+        for (Units myUnit : gameInfo.myUnits) {
+            int i = myUnit.getPosition().y;
+            int j = myUnit.getPosition().x;
+            if (map.getUnit(i - 1, j) != null) {
+                if (!map.getUnit(i - 1, j).getPlayerName().equals(playerName)) {
+                    gameInfo.enemyUnits.add(map.getUnit(i - 1, j));
                 }
             }
-            return gameInfo;
-        } else {
-            /*
-            убрать это
-             */
-            System.out.println("Сейчас ход другого игрока");
-            return null;
+            if (map.getUnit(i + 1, j) != null) {
+                if (!map.getUnit(i + 1, j).getPlayerName().equals(playerName)) {
+                    gameInfo.enemyUnits.add(map.getUnit(i + 1, j));
+                }
+            }
+            if (map.getUnit(i, j - 1) != null) {
+                if (!map.getUnit(i, j - 1).getPlayerName().equals(playerName)) {
+                    gameInfo.enemyUnits.add(map.getUnit(i, j - 1));
+                }
+            }
+            if (map.getUnit(i, j + 1) != null) {
+                if (!map.getUnit(i, j + 1).getPlayerName().equals(playerName)) {
+                    gameInfo.enemyUnits.add(map.getUnit(i, j + 1));
+                }
+            }
+            if (map.getUnit(i + 1, j + 1) != null) {
+                if (!map.getUnit(i + 1, j + 1).getPlayerName().equals(playerName)) {
+                    gameInfo.enemyUnits.add(map.getUnit(i + 1, j + 1));
+                }
+            }
+            if (map.getUnit(i + 1, j - 1) != null) {
+                if (!map.getUnit(i + 1, j - 1).getPlayerName().equals(playerName)) {
+                    gameInfo.enemyUnits.add(map.getUnit(i + 1, j - 1));
+                }
+            }
+            if (map.getUnit(i - 1, j + 1) != null) {
+                if (!map.getUnit(i - 1, j + 1).getPlayerName().equals(playerName)) {
+                    gameInfo.enemyUnits.add(map.getUnit(i - 1, j + 1));
+                }
+            }
+            if (map.getUnit(i - 1, j - 1) != null) {
+                if (!map.getUnit(i - 1, j - 1).getPlayerName().equals(playerName)) {
+                    gameInfo.enemyUnits.add(map.getUnit(i - 1, j - 1));
+                }
+            }
         }
+        return gameInfo;
     }
 
     private void arrangeUnits() {
@@ -191,7 +193,7 @@ public class GameManager {
     }
 
     private boolean isThatPlayerTurn(String name) {
-        if(playerList.get(name).units.size() == 0){
+        if (playerList.get(name).units.size() == 0) {
             /*
             TODO как то информируется о том что этот игрок проигал и проверяется закончена ли игра
              */

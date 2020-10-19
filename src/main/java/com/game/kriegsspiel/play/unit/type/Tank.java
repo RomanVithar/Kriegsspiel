@@ -10,5 +10,6 @@ public class Tank extends Units {
         unitType = UnitType.TANK;
         strong = 20;
         armor = 40;
+        lengthMove = 2;
     }
 }
