@@ -56,8 +56,21 @@ public class GameManager {
                 if (map.getUnit(y1, x1).getPlayerName().equals(playerName)) {
                     if (map.getUnit(y2, x2) != null) {
                         if (!map.getUnit(y2, x2).getPlayerName().equals(playerName)) {
+                            for(int i=0;i<playerList.get(map.getUnit(y2,x2).getPlayerName()).units.size();i++){
+                                if(playerList.get(map.getUnit(y2,x2).getPlayerName()).units.get(i).getPosition().x == x2 &&
+                                        playerList.get(map.getUnit(y2,x2).getPlayerName()).units.get(i).getPosition().y==y2){
+                                    playerList.get(map.getUnit(y2,x2).getPlayerName()).units.remove(i);
+                                }
+                            }
+                            for(int i=0;i<playerList.get(playerName).units.size();i++){
+                                if(playerList.get(playerName).units.get(i).getPosition().x == x1 &&
+                                        playerList.get(playerName).units.get(i).getPosition().y==y1){
+                                    playerList.get(playerName).units.remove(i);
+                                }
+                            }
                             map.setUnit(y2,x2,GameMath.calculateWhoAlive(map.getUnit(y1,x1),map.getUnit(y2,x2)));
                             map.setUnit(y1,x1,null);
+                            playerList.get(map.getUnit(y2,x2).getPlayerName()).units.add(map.getUnit(y2,x2));
                             nextTurn();
                         } else {
                             System.out.println("Пока не доступное перемещение");
@@ -178,6 +191,11 @@ public class GameManager {
     }
 
     private boolean isThatPlayerTurn(String name) {
+        if(playerList.get(name).units.size() == 0){
+            /*
+            TODO как то информируется о том что этот игрок проигал и проверяется закончена ли игра
+             */
+        }
         return name.equals(playerNames.peekLast());
     }
 
