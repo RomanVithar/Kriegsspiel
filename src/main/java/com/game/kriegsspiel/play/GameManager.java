@@ -1,17 +1,15 @@
 package com.game.kriegsspiel.play;
 
-import com.game.kriegsspiel.play.services.GameConstant;
-import com.game.kriegsspiel.play.services.GameInformation;
-import com.game.kriegsspiel.play.services.GameMath;
+import com.game.kriegsspiel.services.GameConstant;
+import com.game.kriegsspiel.services.GameInformation;
+import com.game.kriegsspiel.services.GameMath;
 import com.game.kriegsspiel.play.unit.Units;
 import com.game.kriegsspiel.play.unit.type.Infantry;
 import com.game.kriegsspiel.play.unit.type.Tank;
 
 import java.awt.*;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.List;
 
 public class GameManager {
     private Map<String, Player> playerList;
@@ -24,13 +22,23 @@ public class GameManager {
         map = new GameMap();
     }
 
-    public void addPlayer(String name) {
+    public GameInformation addPlayer(String name) {
+        GameInformation gi = new GameInformation();
+        if (name == null) {
+            gi.setMessageResponse("Неразрешённое имя");
+            return gi;
+        }
+        if(playerList.get(name) != null){
+            gi.setMessageResponse("That name already is");
+            return gi;
+        }
         playerList.put(name, new Player(name));
+        return gi;
     }
 
     public GameInformation startGame() {
         GameInformation gi = new GameInformation();
-        if(playerList.keySet().size()<2){
+        if (playerList.keySet().size() < 2) {
             gi.setMessageResponse("В игре должно учавствовать как минимум 2 игрока");
             return gi;
         }
@@ -50,7 +58,6 @@ public class GameManager {
      * @param y1         - the y coordinate from which to move units.
      * @param x2         - the x coordinate to move to.
      * @param y2         - the y coordinate to move to.
-     *
      * @return - return information about vision available that player
      */
     public GameInformation move(String playerName, int x1, int y1, int x2, int y2) {
@@ -155,6 +162,10 @@ public class GameManager {
             }
         }
         return gameInfo;
+    }
+
+    public Set<String> getPlayers() {
+        return playerList.keySet();
     }
 
     private void arrangeUnits() {

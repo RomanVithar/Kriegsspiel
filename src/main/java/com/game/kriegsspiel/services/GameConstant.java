@@ -1,4 +1,4 @@
-package com.game.kriegsspiel.play.services;
+package com.game.kriegsspiel.services;
 
 public class GameConstant {
     public static final int NUMBER_INFANTRY = 7;
