@@ -1,4 +1,4 @@
-package com.game.kriegsspiel.services;
+package com.game.kriegsspiel.dto;
 
 import com.game.kriegsspiel.play.Player;
 import com.game.kriegsspiel.play.unit.Units;

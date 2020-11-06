@@ -1,7 +1,7 @@
 package com.game.kriegsspiel.play;
 
-import com.game.kriegsspiel.services.GameConstant;
-import com.game.kriegsspiel.services.GameInformation;
+import com.game.kriegsspiel.constants.GlobalConstants;
+import com.game.kriegsspiel.dto.GameInformation;
 import com.game.kriegsspiel.services.GameMath;
 import com.game.kriegsspiel.play.unit.Units;
 import com.game.kriegsspiel.play.unit.type.Infantry;
@@ -9,7 +9,6 @@ import com.game.kriegsspiel.play.unit.type.Tank;
 
 import java.awt.*;
 import java.util.*;
-import java.util.List;
 
 public class GameManager {
     private Map<String, Player> playerList;
@@ -164,20 +163,29 @@ public class GameManager {
         return gameInfo;
     }
 
+    public String whoIsTurn() {
+        for(String name:playerNames){
+            if(isThatPlayerTurn(name)){
+                return name;
+            }
+        }
+        return null;
+    }
+
     public Set<String> getPlayers() {
         return playerList.keySet();
     }
 
     private void arrangeUnits() {
         for (String name : playerNames) {
-            for (int i = 0; i < GameConstant.NUMBER_INFANTRY; i++) {
+            for (int i = 0; i < GlobalConstants.NUMBER_INFANTRY; i++) {
                 Units units = new Infantry(name);
-                fillMapUnitsBy(GameConstant.QUANTITY_INFANTRY, units);
+                fillMapUnitsBy(GlobalConstants.QUANTITY_INFANTRY, units);
                 playerList.get(name).units.add(units);
             }
-            for (int i = 0; i < GameConstant.NUMBER_TANK; i++) {
+            for (int i = 0; i < GlobalConstants.NUMBER_TANK; i++) {
                 Units units = new Tank(name);
-                fillMapUnitsBy(GameConstant.QUANTITY_TANK, units);
+                fillMapUnitsBy(GlobalConstants.QUANTITY_TANK, units);
                 playerList.get(name).units.add(units);
             }
         }

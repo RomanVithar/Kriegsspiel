@@ -1,7 +1,7 @@
 package com.game.kriegsspiel.controller;
 
 import com.game.kriegsspiel.play.GameManager;
-import com.game.kriegsspiel.services.GameInformation;
+import com.game.kriegsspiel.dto.GameInformation;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,4 +47,9 @@ public class PlayController {
         return gameManager.getPlayers();
     }
 
+    @ResponseBody
+    @GetMapping("whoIsTurn")
+    public String whoIsTurn() {
+        return gameManager.whoIsTurn();
+    }
 }

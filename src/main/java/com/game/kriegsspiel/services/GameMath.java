@@ -1,5 +1,6 @@
 package com.game.kriegsspiel.services;
 
+import com.game.kriegsspiel.dto.GameInformation;
 import com.game.kriegsspiel.play.Player;
 import com.game.kriegsspiel.play.unit.Units;
 
